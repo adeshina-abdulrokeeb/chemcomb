@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chemistry Interactive Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f7f7fb; padding:20px; }
+    .quiz-box { max-width: 800px; margin:auto; background:white; padding:25px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+    h2 { margin-bottom:10px; }
+    .option { margin:10px 0; }
+    button { padding:10px 16px; margin:8px 4px; border:none; border-radius:6px; cursor:pointer; }
+    .next { background:#4caf50; color:white; }
+    .prev { background:#607d8b; color:white; }
+    .option-btn { width:100%; text-align:left; background:#eaeaea; }
+    .option-btn.correct { background:#c8e6c9; }
+    .option-btn.wrong { background:#ffcdd2; }
+    .feedback { font-weight:bold; margin-top:15px; }
+  </style>
+</head>
+<body>
+<div class="quiz-box">
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <p class="feedback" id="feedback"></p>
+  <button class="prev" onclick="prevQuestion()">Previous</button>
+  <button class="next" onclick="nextQuestion()">Next</button>
+</div>
+
+<script>
+const quiz = [
+  // 1–20 already covered above
+
+  {q:"Which change would most increase the strength of an ionic bond?", opts:["Larger ionic radius","Lower charge on ions","Higher ionic charge","Greater covalent character"], ans:2},
+  {q:"Why does MgO have a higher melting point than NaCl?", opts:["More atoms per unit","MgO is covalent","Higher lattice energy due to charges","Stronger metallic bonding"], ans:2},
+  {q:"Which molecule is non‑polar despite having polar bonds?", opts:["NH3","H2O","CO2","SO2"], ans:2},
+  {q:"Which factor best explains the malleability of metals?", opts:["Strong ionic bonds","Localized electrons","Delocalized electrons","Covalent network"], ans:2},
+  {q:"A substance changes directly from solid to gas. Which process is this?", opts:["Evaporation","Condensation","Sublimation","Deposition"], ans:2},
+  {q:"Which property best explains why gases are compressible?", opts:["High kinetic energy","Strong intermolecular forces","Large intermolecular spaces","Low temperature"], ans:2},
+  {q:"Which gas property allows perfume to spread across a room?", opts:["Compressibility","Diffusibility","Density","Pressure"], ans:1},
+  {q:"Which hybridization gives a bond angle closest to 120°?", opts:["sp","sp2","sp3","sp3d"], ans:1},
+  {q:"Which molecule contains coordinate (dative) bonding?", opts:["CH4","NH4+","NaCl","H2"], ans:1},
+  {q:"Why does hydrogen bonding increase boiling point?", opts:["It increases molar mass","Extra energy is needed to break attractions","It creates ions","It strengthens covalent bonds"], ans:1},
+  {q:"Which molecule can exhibit hydrogen bonding?", opts:["CH4","HCl","NH3","CO2"], ans:2},
+  {q:"Which intermolecular force is strongest among neutral molecules?", opts:["Van der Waals","Dipole‑dipole","Hydrogen bonding","London dispersion"], ans:2},
+  {q:"Which hybrid orbital contains 50% s character?", opts:["sp","sp2","sp3","sp3d"], ans:0},
+  {q:"Which molecule is linear due to VSEPR considerations?", opts:["H2O","NH3","CO2","SO2"], ans:2},
+  {q:"Which shape results from 5 electron regions and 2 lone pairs?", opts:["Trigonal bipyramidal","T‑shaped","Seesaw","Square planar"], ans:1},
+  {q:"Which molecule is square planar?", opts:["XeF2","SF4","ClF3","XeF4"], ans:3},
+  {q:"Why do lone pairs occupy equatorial positions in trigonal bipyramidal geometry?", opts:["They are heavier","They minimize 90° repulsions","They form pi bonds","They reduce polarity"], ans:1},
+  {q:"Which hybridization corresponds to octahedral geometry?", opts:["sp3","sp3d","sp3d2","sp2"], ans:2},
+  {q:"Which statement about gases is TRUE?", opts:["They exert pressure only downward","They have fixed volume","They exert pressure in all directions","They have strong attractions"], ans:2},
+  {q:"Why does ethanol have a higher boiling point than diethyl ether?", opts:["Higher molar mass","Hydrogen bonding","Stronger covalent bonds","Greater density"], ans:1}
+  ,{q:"Which factor most affects the polarity of a covalent bond?", opts:["Atomic size","Difference in electronegativity","Bond length","Number of bonds"], ans:1},
+  {q:"Why are ionic compounds usually soluble in water?", opts:["Water is non‑polar","Ions interact with dipoles of water","Ionic bonds are weak","Water breaks covalent bonds"], ans:1},
+  {q:"Which change would decrease the rate of diffusion of a gas?", opts:["Increasing temperature","Reducing pressure","Increasing molar mass","Increasing volume"], ans:2},
+  {q:"Which molecule has tetrahedral electron geometry but bent shape?", opts:["CO2","BF3","H2O","BeCl2"], ans:2},
+  {q:"Why does diamond have a very high melting point?", opts:["Ionic bonding","Metallic bonding","Giant covalent structure","Hydrogen bonding"], ans:2},
+  {q:"Which statement correctly compares ionic and covalent bonds?", opts:["Both involve electron transfer","Ionic bonds involve sharing","Covalent bonds involve sharing","Neither involves electrons"], ans:2},
+  {q:"Which hybridization would allow formation of one sigma and two pi bonds?", opts:["sp","sp2","sp3","sp3d"], ans:0},
+  {q:"Which substance conducts electricity in solid state?", opts:["NaCl","Graphite","Ice","Sugar"], ans:1},
+  {q:"Which property of metals explains electrical conductivity?", opts:["High density","Covalent bonding","Delocalized electrons","Strong lattice"], ans:2},
+  {q:"Which molecule is polar overall?", opts:["CO2","BF3","NH3","CCl4"], ans:2},
+  {q:"Why do gases have low density?", opts:["Weak bonds","Large intermolecular spaces","Low mass particles","High kinetic energy"], ans:1},
+  {q:"Which hybridization produces trigonal planar geometry?", opts:["sp","sp2","sp3","sp3d"], ans:1},
+  {q:"Which force exists between all molecules regardless of polarity?", opts:["Hydrogen bonding","Dipole‑dipole","Van der Waals","Ionic attraction"], ans:2},
+  {q:"Why does increasing pressure liquefy a gas?", opts:["Reduces kinetic energy","Brings particles closer","Breaks covalent bonds","Increases volume"], ans:1},
+  {q:"Which molecule has seesaw shape?", opts:["XeF4","SF4","PCl5","BrF5"], ans:1},
+  {q:"Which hybridization corresponds to linear geometry?", opts:["sp","sp2","sp3","sp3d"], ans:0},
+  {q:"Which compound shows strongest hydrogen bonding?", opts:["HCl","H2S","NH3","CH4"], ans:2},
+  {q:"Why is iodine a solid at room temperature?", opts:["Ionic bonding","Strong covalent bonds","Strong van der Waals forces","Hydrogen bonding"], ans:2},
+  {q:"Which shape results from 6 electron regions and 1 lone pair?", opts:["Octahedral","Square planar","Square pyramidal","Trigonal bipyramidal"], ans:2},
+  {q:"Which molecule violates the octet rule but is stable?", opts:["CO2","BF3","H2O","NH3"], ans:1}
+];
+
+let current = 0;
+let locked = false;
+
+function loadQuestion() {
+  locked = false;
+  document.getElementById('feedback').textContent = '';
+  const q = quiz[current];
+  document.getElementById('question').textContent = `Q${current+1}. ${q.q}`;
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  q.opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.className = 'option-btn';
+    btn.onclick = ()=>checkAnswer(btn,i);
+    optDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn,i) {
+  if(locked) return;
+  locked = true;
+  const correct = quiz[current].ans;
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons[correct].classList.add('correct');
+  if(i!==correct) {
+    btn.classList.add('wrong');
+    document.getElementById('feedback').textContent = '❌ Incorrect';
+  } else {
+    document.getElementById('feedback').textContent = '✅ Correct';
+  }
+}
+
+function nextQuestion(){ if(current < quiz.length-1){ current++; loadQuestion(); }}
+function prevQuestion(){ if(current > 0){ current--; loadQuestion(); }}
+
+loadQuestion();
+</script>
+</body>
+</html>
