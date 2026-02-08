@@ -2,37 +2,129 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Chemistry Interactive Quiz</title>
+  <title>Chemistry Interactive CBT Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f7f7fb; padding:20px; }
-    .quiz-box { max-width: 800px; margin:auto; background:white; padding:25px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
-    h2 { margin-bottom:10px; }
-    .option { margin:10px 0; }
-    button { padding:10px 16px; margin:8px 4px; border:none; border-radius:6px; cursor:pointer; }
-    .next { background:#4caf50; color:white; }
-    .prev { background:#607d8b; color:white; }
-    .option-btn { width:100%; text-align:left; background:#eaeaea; }
-    .option-btn.correct { background:#c8e6c9; }
-    .option-btn.wrong { background:#ffcdd2; }
-    .feedback { font-weight:bold; margin-top:15px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quiz-box {
+      width: 90%;
+      max-width: 900px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .progress {
+      margin-bottom: 15px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .option-btn {
+      width: 100%;
+      padding: 15px 18px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: left;
+    }
+
+    .option-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0,255,255,0.35);
+      background: rgba(255,255,255,0.18);
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #00c853, #64dd17);
+      box-shadow: 0 0 18px rgba(0,255,100,0.7);
+      color: #000;
+    }
+
+    .option-btn.wrong {
+      background: linear-gradient(135deg, #d50000, #ff5252);
+      box-shadow: 0 0 18px rgba(255,50,50,0.7);
+    }
+
+    .option-btn.locked {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+
+    button.nav {
+      padding: 12px 22px;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(135deg, #00e5ff, #2979ff);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button.nav:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0,200,255,0.8);
+    }
+
+    .score-screen {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .score-screen h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .score-screen p {
+      font-size: 20px;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
-<div class="quiz-box">
+<div class="quiz-box" id="quizBox">
+  <div class="progress" id="progress"></div>
   <h2 id="question"></h2>
   <div id="options"></div>
-  <p class="feedback" id="feedback"></p>
-  <button class="prev" onclick="prevQuestion()">Previous</button>
-  <button class="next" onclick="nextQuestion()">Next</button>
+  <div class="controls">
+    <button class="nav" onclick="prevQuestion()">◀ Previous</button>
+    <button class="nav" onclick="nextQuestion()">Next ▶</button>
+  </div>
 </div>
 
 <script>
 const quiz = [
-  // 1–20 already covered above
-
   {q:"Which change would most increase the strength of an ionic bond?", opts:["Larger ionic radius","Lower charge on ions","Higher ionic charge","Greater covalent character"], ans:2},
   {q:"Why does MgO have a higher melting point than NaCl?", opts:["More atoms per unit","MgO is covalent","Higher lattice energy due to charges","Stronger metallic bonding"], ans:2},
-  {q:"Which molecule is non‑polar despite having polar bonds?", opts:["NH3","H2O","CO2","SO2"], ans:2},
+  {q:"Which molecule is non-polar despite having polar bonds?", opts:["NH3","H2O","CO2","SO2"], ans:2},
   {q:"Which factor best explains the malleability of metals?", opts:["Strong ionic bonds","Localized electrons","Delocalized electrons","Covalent network"], ans:2},
   {q:"A substance changes directly from solid to gas. Which process is this?", opts:["Evaporation","Condensation","Sublimation","Deposition"], ans:2},
   {q:"Which property best explains why gases are compressible?", opts:["High kinetic energy","Strong intermolecular forces","Large intermolecular spaces","Low temperature"], ans:2},
@@ -40,73 +132,99 @@ const quiz = [
   {q:"Which hybridization gives a bond angle closest to 120°?", opts:["sp","sp2","sp3","sp3d"], ans:1},
   {q:"Which molecule contains coordinate (dative) bonding?", opts:["CH4","NH4+","NaCl","H2"], ans:1},
   {q:"Why does hydrogen bonding increase boiling point?", opts:["It increases molar mass","Extra energy is needed to break attractions","It creates ions","It strengthens covalent bonds"], ans:1},
-  {q:"Which molecule can exhibit hydrogen bonding?", opts:["CH4","HCl","NH3","CO2"], ans:2},
-  {q:"Which intermolecular force is strongest among neutral molecules?", opts:["Van der Waals","Dipole‑dipole","Hydrogen bonding","London dispersion"], ans:2},
-  {q:"Which hybrid orbital contains 50% s character?", opts:["sp","sp2","sp3","sp3d"], ans:0},
-  {q:"Which molecule is linear due to VSEPR considerations?", opts:["H2O","NH3","CO2","SO2"], ans:2},
-  {q:"Which shape results from 5 electron regions and 2 lone pairs?", opts:["Trigonal bipyramidal","T‑shaped","Seesaw","Square planar"], ans:1},
-  {q:"Which molecule is square planar?", opts:["XeF2","SF4","ClF3","XeF4"], ans:3},
-  {q:"Why do lone pairs occupy equatorial positions in trigonal bipyramidal geometry?", opts:["They are heavier","They minimize 90° repulsions","They form pi bonds","They reduce polarity"], ans:1},
-  {q:"Which hybridization corresponds to octahedral geometry?", opts:["sp3","sp3d","sp3d2","sp2"], ans:2},
-  {q:"Which statement about gases is TRUE?", opts:["They exert pressure only downward","They have fixed volume","They exert pressure in all directions","They have strong attractions"], ans:2},
-  {q:"Why does ethanol have a higher boiling point than diethyl ether?", opts:["Higher molar mass","Hydrogen bonding","Stronger covalent bonds","Greater density"], ans:1}
-  ,{q:"Which factor most affects the polarity of a covalent bond?", opts:["Atomic size","Difference in electronegativity","Bond length","Number of bonds"], ans:1},
-  {q:"Why are ionic compounds usually soluble in water?", opts:["Water is non‑polar","Ions interact with dipoles of water","Ionic bonds are weak","Water breaks covalent bonds"], ans:1},
-  {q:"Which change would decrease the rate of diffusion of a gas?", opts:["Increasing temperature","Reducing pressure","Increasing molar mass","Increasing volume"], ans:2},
+
   {q:"Which molecule has tetrahedral electron geometry but bent shape?", opts:["CO2","BF3","H2O","BeCl2"], ans:2},
-  {q:"Why does diamond have a very high melting point?", opts:["Ionic bonding","Metallic bonding","Giant covalent structure","Hydrogen bonding"], ans:2},
-  {q:"Which statement correctly compares ionic and covalent bonds?", opts:["Both involve electron transfer","Ionic bonds involve sharing","Covalent bonds involve sharing","Neither involves electrons"], ans:2},
-  {q:"Which hybridization would allow formation of one sigma and two pi bonds?", opts:["sp","sp2","sp3","sp3d"], ans:0},
+  {q:"Which intermolecular force exists in all molecular substances?", opts:["Hydrogen bonding","Dipole-dipole","Van der Waals","Ionic"], ans:2},
+  {q:"Why do ionic compounds conduct electricity when molten?", opts:["Free electrons","Mobile ions","Weak bonds","High temperature"], ans:1},
   {q:"Which substance conducts electricity in solid state?", opts:["NaCl","Graphite","Ice","Sugar"], ans:1},
-  {q:"Which property of metals explains electrical conductivity?", opts:["High density","Covalent bonding","Delocalized electrons","Strong lattice"], ans:2},
-  {q:"Which molecule is polar overall?", opts:["CO2","BF3","NH3","CCl4"], ans:2},
-  {q:"Why do gases have low density?", opts:["Weak bonds","Large intermolecular spaces","Low mass particles","High kinetic energy"], ans:1},
-  {q:"Which hybridization produces trigonal planar geometry?", opts:["sp","sp2","sp3","sp3d"], ans:1},
-  {q:"Which force exists between all molecules regardless of polarity?", opts:["Hydrogen bonding","Dipole‑dipole","Van der Waals","Ionic attraction"], ans:2},
-  {q:"Why does increasing pressure liquefy a gas?", opts:["Reduces kinetic energy","Brings particles closer","Breaks covalent bonds","Increases volume"], ans:1},
-  {q:"Which molecule has seesaw shape?", opts:["XeF4","SF4","PCl5","BrF5"], ans:1},
+  {q:"Which hybridization allows formation of two pi bonds?", opts:["sp","sp2","sp3","sp3d"], ans:0},
+  {q:"Why is CO2 linear despite having double bonds?", opts:["Equal charges","Two electron regions","No lone pairs","High symmetry"], ans:1},
+  {q:"Which molecule is square planar?", opts:["XeF2","SF4","ClF3","XeF4"], ans:3},
+  {q:"Why do lone pairs reduce bond angles?", opts:["They repel more strongly","They are lighter","They attract nuclei","They form pi bonds"], ans:0},
+  {q:"Which gas property explains balloon expansion on heating?", opts:["Diffusion","Compressibility","Expansibility","Density"], ans:2},
+  {q:"Which change would decrease diffusion rate of a gas?", opts:["Increase temperature","Decrease pressure","Increase molar mass","Increase volume"], ans:2},
+
+  {q:"Which molecule has T-shaped geometry?", opts:["SF4","ClF3","XeF4","PCl5"], ans:1},
+  {q:"Which hybridization corresponds to trigonal planar geometry?", opts:["sp","sp2","sp3","sp3d"], ans:1},
+  {q:"Which condition is necessary for hydrogen bonding?", opts:["Large atom","Low electronegativity","H bonded to N, O or F","Ionic charge"], ans:2},
+  {q:"Why does ethanol have higher boiling point than ether?", opts:["Greater molar mass","Hydrogen bonding","Stronger covalent bonds","Polarity only"], ans:1},
+  {q:"Which molecule violates the octet rule but is stable?", opts:["NH3","H2O","BF3","CO2"], ans:2},
+  {q:"Which geometry results from 5 electron regions?", opts:["Octahedral","Trigonal bipyramidal","Tetrahedral","Square planar"], ans:1},
+  {q:"Which molecule shows seesaw shape?", opts:["XeF4","SF4","BrF5","IF7"], ans:1},
+  {q:"Why are metals good conductors of heat?", opts:["High density","Strong covalent bonds","Mobile electrons","High melting point"], ans:2},
+  {q:"Which change favours condensation of a gas?", opts:["High temperature","Low pressure","High pressure","Large volume"], ans:2},
+  {q:"Which shape results from 6 electron regions and 2 lone pairs?", opts:["Octahedral","Square planar","Square pyramidal","Trigonal bipyramidal"], ans:1},
+
+  {q:"Which molecule has linear shape but sp3 hybridization?", opts:["CO2","XeF2","BeCl2","C2H2"], ans:1},
+  {q:"Why does NH3 have a smaller bond angle than CH4?", opts:["Lower mass","More bonds","Lone pair repulsion","Different hybridization"], ans:2},
+  {q:"Which force is weakest?", opts:["Ionic","Covalent","Hydrogen bond","Van der Waals"], ans:3},
+  {q:"Which molecule has pentagonal bipyramidal geometry?", opts:["SF6","IF7","PCl5","XeF4"], ans:1},
   {q:"Which hybridization corresponds to linear geometry?", opts:["sp","sp2","sp3","sp3d"], ans:0},
-  {q:"Which compound shows strongest hydrogen bonding?", opts:["HCl","H2S","NH3","CH4"], ans:2},
-  {q:"Why is iodine a solid at room temperature?", opts:["Ionic bonding","Strong covalent bonds","Strong van der Waals forces","Hydrogen bonding"], ans:2},
-  {q:"Which shape results from 6 electron regions and 1 lone pair?", opts:["Octahedral","Square planar","Square pyramidal","Trigonal bipyramidal"], ans:2},
-  {q:"Which molecule violates the octet rule but is stable?", opts:["CO2","BF3","H2O","NH3"], ans:1}
+  {q:"Why are gases low in density?", opts:["Weak forces","Large intermolecular spaces","Small mass","Random motion"], ans:1},
+  {q:"Which molecule is polar overall?", opts:["CO2","BF3","NH3","CCl4"], ans:2},
+  {q:"Which bond type involves a sea of electrons?", opts:["Ionic","Covalent","Metallic","Hydrogen"], ans:2},
+  {q:"Which molecule has square pyramidal shape?", opts:["BrF5","XeF4","SF6","PCl5"], ans:0},
+  {q:"Which statement about VSEPR is correct?", opts:["Shape depends on atoms","Shape minimizes repulsion","Only bonds repel","Charge determines shape"], ans:1}
 ];
 
 let current = 0;
-let locked = false;
+let answers = Array(quiz.length).fill(null);
 
 function loadQuestion() {
-  locked = false;
-  document.getElementById('feedback').textContent = '';
   const q = quiz[current];
-  document.getElementById('question').textContent = `Q${current+1}. ${q.q}`;
+  document.getElementById('progress').textContent = `Question ${current+1} of ${quiz.length}`;
+  document.getElementById('question').textContent = q.q;
   const optDiv = document.getElementById('options');
   optDiv.innerHTML = '';
-  q.opts.forEach((opt,i)=>{
+
+  q.opts.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.textContent = opt;
     btn.className = 'option-btn';
-    btn.onclick = ()=>checkAnswer(btn,i);
+
+    if (answers[current] !== null) {
+      btn.classList.add('locked');
+      if (i === quiz[current].ans) btn.classList.add('correct');
+      if (i === answers[current] && answers[current] !== quiz[current].ans) btn.classList.add('wrong');
+    } else {
+      btn.onclick = () => selectAnswer(i, btn);
+    }
+
     optDiv.appendChild(btn);
   });
 }
 
-function checkAnswer(btn,i) {
-  if(locked) return;
-  locked = true;
-  const correct = quiz[current].ans;
-  const buttons = document.querySelectorAll('.option-btn');
-  buttons[correct].classList.add('correct');
-  if(i!==correct) {
-    btn.classList.add('wrong');
-    document.getElementById('feedback').textContent = '❌ Incorrect';
+function selectAnswer(i, btn) {
+  answers[current] = i;
+  loadQuestion();
+}
+
+function nextQuestion() {
+  if (current < quiz.length - 1) {
+    current++;
+    loadQuestion();
   } else {
-    document.getElementById('feedback').textContent = '✅ Correct';
+    showScore();
   }
 }
 
-function nextQuestion(){ if(current < quiz.length-1){ current++; loadQuestion(); }}
-function prevQuestion(){ if(current > 0){ current--; loadQuestion(); }}
+function prevQuestion() {
+  if (current > 0) {
+    current--;
+    loadQuestion();
+  }
+}
+
+function showScore() {
+  let score = 0;
+  answers.forEach((a, i) => { if (a === quiz[i].ans) score++; });
+  const box = document.getElementById('quizBox');
+  box.innerHTML = `
+    <div class="score-screen">
+      <h1>${score} / ${quiz.length}</h1>
+      <p>Your final score</p>
+    </div>`;
+}
 
 loadQuestion();
 </script>
